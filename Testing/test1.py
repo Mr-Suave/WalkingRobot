@@ -1,45 +1,35 @@
-# import os
+import cv2
+from humanoid_library import (
+    load_image,
+    preprocess_image,
+    PoseExtractor,
+    select_main_skeleton_multiple,
+)
 
-# current_dir = os.path.dirname(__file__)
-# image_path = os.path.join(current_dir, "Person.jpeg")
+# Path to your test image
+image_path = "img1.jpg"
+save_path = "img1_skeleton.jpg"
 
-from humanoid_library import load_image,preprocess_image
-from humanoid_library import PoseExtractor, select_main_skeleton_multiple,compute_joint_angles
+# 1️⃣ Load image
+image = load_image(image_path)
 
-image1_path = "People.jpg"
-image2_path = "Person.jpeg"
-save1_path = "Output1.jpg"
-save2_path = "Output2.jpg"
+# 2️⃣ Preprocess (resize if needed)
+image_resized = preprocess_image(image, target_size=(512, 512))
 
-# load and process the image
-image1 = load_image(image1_path)
-image2 = load_image(image2_path)
-image1r = preprocess_image(image1,(640,480))
-image2r = preprocess_image(image2,(640,480))
+# 3️⃣ Initialize Mediapipe Pose extractor
+pose_extractor = PoseExtractor()
 
-# instantiate the pose extractor class
-extractor = PoseExtractor()
+# 4️⃣ Extract skeleton
+skeleton = pose_extractor.extract_keypoints(image_resized)
 
-main_skel1 = select_main_skeleton_multiple(extractor,image1r,save1_path)
-main_skel2 = select_main_skeleton_multiple(extractor,image2r,save2_path)
-
-if main_skel1 is None:
-    print("No person in image1")
+if skeleton is None or len(skeleton) == 0:
+    print("No skeleton detected!")
 else:
-    angles1 = compute_joint_angles(main_skel1)
-    print("The joint angles are: ",angles1)
+    # 5️⃣ Draw skeleton and save
+    pose_extractor.draw_skeleton(image_resized, skeleton, save_path)
+    print(f"Skeleton drawn and saved to {save_path}")
 
-if main_skel2 is None:
-    print("No person in image2")
-else:
-    angles2 = compute_joint_angles(main_skel2)
-    print("The joint angles are: ",angles2)
-
-
-# img = load_image("People.jpg")
-# img_ready = preprocess_image(img,(368,368))
-# print(img_ready.shape)
-# extractor = PoseExtractor()
-# keypoints = extractor.extract_keypoints("People.jpg",True,"output_pose1.jpg")
-# print(keypoints.shape)
-# print(keypoints)
+    # Optional: show image in window
+    cv2.imshow("Skeleton Overlay", cv2.cvtColor((image_resized*255).astype(np.uint8), cv2.COLOR_RGB2BGR))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()

@@ -18,7 +18,7 @@ class PoseExtractor:
             return []
         
         landmarks = results.pose_landmarks.landmark
-        keypoints_33 = np.array([[lm.x,lm.y, lm.visibility] for lm in landmarks])
+        keypoints_33 = np.array([[lm.x,lm.y, lm.z, lm.visibility] for lm in landmarks])
 
         #chosen 25 points similar to the ones in body_25 model approx using the mediapipe
         #the design choise to use mediapipe is body_25 has lot of dependencies which makes it tough to install and use for the end user
@@ -61,52 +61,7 @@ class PoseExtractor:
         body25 = np.array(body25)
         return body25
     
-    # def draw_skeleton(self, image, skeleton_points, save_path):
-    #     """
-    #     Draw body 25-like skeleton on top of the original image (not black background).
-    #     """
-    #     # Make a copy of the original image to draw overlays
-    #     output_image = image.copy()
-    #     h, w, _ = output_image.shape
-
-    #     # Define approximate BODY25-like connections (with spine added)
-    #     connections = [
-    #         (0, 1), (1, 2), (2, 3), (3, 4),       # Right arm
-    #         (1, 5), (5, 6), (6, 7),               # Left arm
-    #         (1, 8), (8, 9), (9, 10), (10, 11),    # Right leg
-    #         (8, 12), (12, 13), (13, 14),          # Left leg
-    #         (0, 15), (15, 17),                    # Right head
-    #         (0, 16), (16, 18),                    # Left head
-    #         (14, 19), (19, 20), (14, 21),         # Left foot
-    #         (11, 22), (22, 23), (11, 24),         # Right foot
-    #         (1, 8)                                # Spine (neck → hip)
-    #     ]
-
-    #     # --- Draw bones (connections)
-    #     for start, end in connections:
-    #         x1, y1, c1 = skeleton_points[start]
-    #         x2, y2, c2 = skeleton_points[end]
-    #         if c1 > 0.3 and c2 > 0.3:
-    #             cv2.line(output_image, (int(x1 * w), int(y1 * h)),
-    #                      (int(x2 * w), int(y2 * h)), (0, 0, 255), 2)
-
-    #     # --- Draw joints (keypoints)
-    #     for i, (x, y, c) in enumerate(skeleton_points):
-    #         if c > 0.3:
-    #             cv2.circle(output_image, (int(x * w), int(y * h)), 5, (0, 255, 255), -1)
-    #             cv2.putText(output_image, str(i), (int(x * w) + 4, int(y * h) - 4),
-    #                         cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-
-    #     # --- Save or display
-    #     if save_path:
-    #         # Convert float image [0,1] back to uint8 [0,255] for saving
-    #         image_to_save = (output_image * 255).astype(np.uint8)
-    #         cv2.imwrite(save_path, image_to_save)
-    #         print(f"Skeleton overlay saved to: {save_path}")
-    #     else:
-    #         cv2.imshow("Skeleton Overlay", output_image)
-    #         cv2.waitKey(0)
-    #         cv2.destroyAllWindows()
+    
     def draw_skeleton(self, image, skeleton_points, save_path):
         """
         Draw body 25-like skeleton on top of the original image (not black background).
@@ -128,14 +83,15 @@ class PoseExtractor:
 
         # Drawing bones
         for start, end in connections:
-            x1, y1, c1 = skeleton_points[start]
-            x2, y2, c2 = skeleton_points[end]
+            print("skeleton_points: ", skeleton_points)
+            x1, y1, c1 = skeleton_points[start][0],skeleton_points[start][1],skeleton_points[start][3]
+            x2, y2, c2 = skeleton_points[end][0],skeleton_points[end][1],skeleton_points[end][3]
             if c1 > 0 and c2 > 0:
                 cv2.line(output_image, (int(x1 * w), int(y1 * h)),
                         (int(x2 * w), int(y2 * h)), (0, 0, 255), 2)
 
         # Drawing joints
-        for i, (x, y, c) in enumerate(skeleton_points):
+        for i, (x, y, z, c) in enumerate(skeleton_points):
             if c > 0:
                 cv2.circle(output_image, (int(x * w), int(y * h)), 5, (0, 255, 255), -1)
                 cv2.putText(output_image, str(i), (int(x * w) + 4, int(y * h) - 4),

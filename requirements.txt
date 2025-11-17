@@ -3,3 +3,4 @@ opencv-python
 mediapipe 
 gymnasium 
 pybullet
+ultralytics
