@@ -7,10 +7,11 @@ humanoid_library.egg-info/dependency_links.txt
 humanoid_library.egg-info/requires.txt
 humanoid_library.egg-info/top_level.txt
 humanoid_library/humanoid_sim/__init__.py
-humanoid_library/humanoid_sim/humanoid_walking_env.py
-humanoid_library/humanoid_sim/reconstruct_and_init.py
-humanoid_library/humanoid_sim/skeleton_to_urdf.py
+humanoid_library/humanoid_sim/visualize.py
 humanoid_library/pose_estimation/__init__.py
 humanoid_library/pose_estimation/imgAcquisition.py
 humanoid_library/pose_estimation/keyPointExtraction.py
 humanoid_library/pose_estimation/kinematicConversion.py
+training/__init__.py
+training/ppo_agent.py
+training/train.py

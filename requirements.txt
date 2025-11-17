@@ -4,3 +4,6 @@ mediapipe
 gymnasium 
 pybullet
 ultralytics
+mujoco 
+gymnasium[mujoco]
+torch

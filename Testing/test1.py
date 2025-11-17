@@ -1,35 +1,25 @@
-import cv2
-from humanoid_library import (
-    load_image,
-    preprocess_image,
-    PoseExtractor,
-    select_main_skeleton_multiple,
-)
+# run_demo.py
+import os
+from humanoid_library import AdamLiteEnv
+import time
+import numpy as np
 
-# Path to your test image
-image_path = "img1.jpg"
-save_path = "img1_skeleton.jpg"
+# change this to the path where you cloned the menagerie repo.
+# recommended: point to the scene.xml file in the adam_lite folder, e.g.:
+SCENE_PATH = r"C:\Anvay\Github\WalkingRobot\humanoid_library\humanoid_sim\scene.xml"
 
-# 1️⃣ Load image
-image = load_image(image_path)
+env = AdamLiteEnv(scene_xml_path=SCENE_PATH, render_mode="human")
+obs, _ = env.reset()
 
-# 2️⃣ Preprocess (resize if needed)
-image_resized = preprocess_image(image, target_size=(512, 512))
+try:
+    for _ in range(5000):
+        # simple random action (or zeros)
+        if env.action_space.shape[0] > 0:
+            a = env.action_space.sample()
+        else:
+            a = np.array([])
+        obs, reward, terminated, truncated, info = env.step(a)
+        time.sleep(env.dt)  # slow down to realtime-ish
+finally:
+    env.close()
 
-# 3️⃣ Initialize Mediapipe Pose extractor
-pose_extractor = PoseExtractor()
-
-# 4️⃣ Extract skeleton
-skeleton = pose_extractor.extract_keypoints(image_resized)
-
-if skeleton is None or len(skeleton) == 0:
-    print("No skeleton detected!")
-else:
-    # 5️⃣ Draw skeleton and save
-    pose_extractor.draw_skeleton(image_resized, skeleton, save_path)
-    print(f"Skeleton drawn and saved to {save_path}")
-
-    # Optional: show image in window
-    cv2.imshow("Skeleton Overlay", cv2.cvtColor((image_resized*255).astype(np.uint8), cv2.COLOR_RGB2BGR))
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()

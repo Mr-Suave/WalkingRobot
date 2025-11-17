@@ -7,14 +7,9 @@ from .pose_estimation.imgAcquisition import load_image, preprocess_image
 from .pose_estimation.keyPointExtraction import PoseExtractor
 from .pose_estimation.kinematicConversion import (
     select_main_skeleton_multiple,
-    compute_joint_angles,  # This is the OLD function from kinematicConversion.py
-    vector_to_rotation
+    compute_joint_angles_improved,  # This is the OLD function from kinematicConversion.py
 )
-
-# ---- Humanoid Simulation (NEW) ----
-from .humanoid_sim.skeleton_to_urdf import SkeletonToURDFMapper  # NEW mapper class
-from .humanoid_sim.humanoid_walking_env import HumanoidWalkingEnv  # NEW RL env
-from .humanoid_sim.reconstruct_and_init import Reconstructor
+from .humanoid_sim.visualize import AdamLiteEnv
 
 
 __all__ = [
@@ -23,13 +18,8 @@ __all__ = [
     "preprocess_image",
     "PoseExtractor", 
     "select_main_skeleton_multiple",
-    "compute_joint_angles",  # OLD function from kinematicConversion.py
-    "vector_to_rotation",
-    
-    # NEW: RL components
-    "SkeletonToURDFMapper",  # NEW mapper class
-    "HumanoidWalkingEnv",     # NEW walking environment
-    "Reconstructor"
+    "compute_joint_angles_improved", # OLD function from kinematicConversion.py
+    "AdamLiteEnv"
 ]
 
 __version__ = "0.2.0"

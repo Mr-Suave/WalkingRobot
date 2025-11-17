@@ -18,7 +18,7 @@ class PoseExtractor:
             return []
         
         landmarks = results.pose_landmarks.landmark
-        keypoints_33 = np.array([[lm.x,lm.y, lm.z, lm.visibility] for lm in landmarks])
+        keypoints_33 = np.array([[lm.x,lm.y, lm.visibility] for lm in landmarks])
 
         #chosen 25 points similar to the ones in body_25 model approx using the mediapipe
         #the design choise to use mediapipe is body_25 has lot of dependencies which makes it tough to install and use for the end user
@@ -61,7 +61,6 @@ class PoseExtractor:
         body25 = np.array(body25)
         return body25
     
-    
     def draw_skeleton(self, image, skeleton_points, save_path):
         """
         Draw body 25-like skeleton on top of the original image (not black background).
@@ -83,15 +82,14 @@ class PoseExtractor:
 
         # Drawing bones
         for start, end in connections:
-            print("skeleton_points: ", skeleton_points)
-            x1, y1, c1 = skeleton_points[start][0],skeleton_points[start][1],skeleton_points[start][3]
-            x2, y2, c2 = skeleton_points[end][0],skeleton_points[end][1],skeleton_points[end][3]
+            x1, y1, c1 = skeleton_points[start]
+            x2, y2, c2 = skeleton_points[end]
             if c1 > 0 and c2 > 0:
                 cv2.line(output_image, (int(x1 * w), int(y1 * h)),
                         (int(x2 * w), int(y2 * h)), (0, 0, 255), 2)
 
         # Drawing joints
-        for i, (x, y, z, c) in enumerate(skeleton_points):
+        for i, (x, y, c) in enumerate(skeleton_points):
             if c > 0:
                 cv2.circle(output_image, (int(x * w), int(y * h)), 5, (0, 255, 255), -1)
                 cv2.putText(output_image, str(i), (int(x * w) + 4, int(y * h) - 4),
