@@ -1,1 +1,7 @@
 venv/
+PPO-Humanoid/venv/
+__pycache__/
+PPO-Humanoid/__pycache__/
+PPO-Humanoid/checkpoints/
+PPO-Humanoid/logs/
+PPO-Humanoid/videos/
