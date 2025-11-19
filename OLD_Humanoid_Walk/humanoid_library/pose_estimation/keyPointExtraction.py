@@ -18,7 +18,7 @@ class PoseExtractor:
             return []
         
         landmarks = results.pose_landmarks.landmark
-        keypoints_33 = np.array([[lm.x,lm.y, lm.visibility] for lm in landmarks])
+        keypoints_33 = np.array([[lm.x,lm.y, lm.z] for lm in landmarks])
 
         #chosen 25 points similar to the ones in body_25 model approx using the mediapipe
         #the design choise to use mediapipe is body_25 has lot of dependencies which makes it tough to install and use for the end user

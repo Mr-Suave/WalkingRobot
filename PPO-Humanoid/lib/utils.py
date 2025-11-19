@@ -24,7 +24,7 @@ def parse_args_ppo() -> argparse.Namespace:
     parser.add_argument("--target-kl", type=float, default=0.01, help="Target KL divergence")
     parser.add_argument("--learning-rate", type=float, default=1e-4, help="Learning rate")
     parser.add_argument("--reward-scale", type=float, default=0.01, help="Reward scaling")
-    parser.add_argument("--render-epoch", type=int, default=10, help="Render every n-th epoch")
+    parser.add_argument("--render-epoch", type=int, default=1000, help="Render every n-th epoch")
     return parser.parse_args()
 
 
