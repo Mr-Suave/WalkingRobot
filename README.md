@@ -27,7 +27,9 @@ This project demonstrates training a walking gait for a MuJoCo Humanoid robot us
 
 Below is a demonstration of the full pipeline, from pose initialization to the trained agent walking.
 
-![Demo of full pipeline](./PPO-Humanoid/demo.mp4)
+![Demo of full pipeline](./PPO-Humanoid/demo_gif.gif_)
+
+Note: A high clarity video is also available at `PPO-humanoid/demo.mp4`
 
 ## Features
 
