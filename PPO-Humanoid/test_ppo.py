@@ -13,7 +13,8 @@ if __name__ == "__main__":
     env = gym.make("Humanoid-v5", render_mode="human")
 
     # --- Pose Estimation Integration ---
-    image_path = "img4.jpg"  
+    print("Hello! Please input your file name for initial pose: ")
+    image_path = input()  
     out_path = "out.jpg"
     try:
         image = load_image(image_path)

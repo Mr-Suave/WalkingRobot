@@ -1,151 +1,174 @@
-# PPO-Humanoid
+# Humanoid Control with PPO and Pose-Informed Initialization
+*Project by: Anvay Joshi, Srikrishna Kidambi, Stany Cletus* 
 
-This repository contains the implementation of a Proximal Policy Optimization (PPO) agent to control a humanoid in the
-OpenAI Gymnasium Mujoco environment. The agent is trained to master complex humanoid locomotion using deep reinforcement
-learning.
-
----
+This project demonstrates training a walking gait for a MuJoCo Humanoid robot using Proximal Policy Optimization (PPO) This is a form of Reinforcement Learning that works best with continuous action spaces, whereas Q Learning works well with discrete action spaces. Our project includes a pre-trained model and a pipeline to initialize the humanoid's starting pose based on keypoints extracted from a user-provided image.
 
 ## Results
 
-![Demo Gif](/docs/demo.gif)
+<table>
+  <tr align="center">
+    <td><b>Input Image</b></td>
+    <td><b>Skeleton Extraction</b></td>
+    <td><b>Initial Humanoid Pose</b></td>
+  </tr>
+  <tr>
+    <td><img src="img4.jpg" alt="Input Image" width="100%"></td>
+    <td><img src="out.jpg" alt="Image with skeleton identified" width="100%"></td>
+    <td><img src="initial_pose.png" alt="Humanoid with initial pose" width="100%"></td>
+  </tr>
+  <tr align="center">
+    <td>1. The input image provided to the model.</td>
+    <td>2. The detected skeleton overlaid on the image.</td>
+    <td>3. The humanoid's arms are set to the initial pose.</td>
+  </tr>
+</table>
 
-The clip above showcases the performance of the PPO agent in the Humanoid-v5 environment after about 1000 epochs of
-training.
+## Demo
 
----
+Below is a demonstration of the full pipeline, from pose initialization to the trained agent walking.
 
-## Getting Started
+![Demo of full pipeline](docs/demo.gif)
 
-To get started with this project, follow these steps:
+## Features
 
-1. **Clone the Repository**:
+- **Reinforcement Learning**: Utilizes PPO to train a `Humanoid-v5` agent from the Gymnasium environment.
+- **Pose Initialization**: Extracts a 2D pose from an image using MediaPipe, converts it to 3D kinematic joint angles, and applies it to the humanoid's arms for a custom starting position.
+- **Dynamic Stabilization**: Applies a dynamic forward force to the humanoid's shoulders, proportional to the agent's hip actions, to promote a stable, forward-leaning posture. ( This was done in addition to the model's forces because otherwise the humanoid looked like an "evil spirit" was pulling it from the hip forward 🩻)
+- **Pre-trained Model**: Includes a `model.pt` file for immediate testing. (This model was trained for 1000 epochs and took quite long)
+- **Comprehensive Training Script**: Provides a detailed training script (`train_ppo.py`) with hyperparameter tuning, logging via TensorBoard, and video recording of progress.
+
+## Project Structure
+
+```
+/
+├── lib/                    # Core PPO implementation
+│   ├── agent_ppo.py        # PPO Actor-Critic agent architecture
+│   ├── buffer_ppo.py       # Replay buffer for storing trajectories
+│   └── utils.py            # Helper functions, argument parsing, env creation
+├── pose_estimation/        # Human pose estimation pipeline
+│   ├── imgAcquisition.py   # Image loading and preprocessing
+│   ├── keyPointExtraction.py # 2D/3D keypoint extraction using MediaPipe
+│   └── kinematicConversion.py # Conversion of keypoints to MuJoCo joint angles
+├── checkpoints/            # Saved model checkpoints from training
+├── logs/                   # TensorBoard logs for monitoring training
+├── videos/                 # Rendered videos of agent performance
+├── get_joint_data.py       # Utility script to inspect humanoid model joints
+├── model.pt                # Pre-trained model file
+├── req.txt                 # Python dependencies
+├── test_ppo.py             # Script to test the pre-trained model with pose init
+└── train_ppo.py            # Script to train a new model from scratch
+```
+
+## Setup and Installation
+
+These instructions will guide you through setting up the project environment.
+
+**1. Create a Virtual Environment**
+
+It is crucial to use **Python 3.12**, as the MediaPipe library has specific compatibility requirements. Move into the PPO-Humanoid folder first.
+
+```bash
+# Create a virtual environment named 'venv'
+cd PPO-Humanoid
+python3.12 -m venv venv
+```
+
+**2. Activate the Virtual Environment**
+
+-   On **Windows**:
     ```bash
-    git clone https://github.com/ProfessorNova/PPO-Humanoid.git
-    cd PPO-Humanoid
+    .\venv\Scripts\activate
+    ```
+-   On **macOS and Linux**:
+    ```bash
+    source venv/bin/activate
     ```
 
-2. **Set Up Python Environment**:
-   Make sure you have Python installed (tested with Python 3.10.11). It's recommended to create a virtual environment to
-   avoid dependency conflicts. You can use `venv` or `conda` for this purpose.
+**3. Install Dependencies**
 
-3. **Install Dependencies**:
-   Run the following command to install the required packages:
-    ```bash
-    pip install -r req.txt
-    ```
+Install all the required Python packages from the `req.txt` file.
 
-   For proper PyTorch installation, visit [pytorch.org](https://pytorch.org/get-started/locally/) and follow the
-   instructions based on your system configuration.
+```bash
+pip install -r req.txt
+```
 
-4. **Install Gymnasium Mujoco**:
-   You need to install the Mujoco environment to simulate the humanoid:
-    ```bash
-    pip install gymnasium[mujoco]
-    ```
+## How to Use
 
-5. **Train the Model**:
-   To start training the model, run:
-    ```bash
-    python train_ppo.py
-    ```
-   This creates the folders `checkpoints`, `logs`, and `videos` in the root of the repository. The `checkpoints` folder
-   will contain the model checkpoints, the `logs` folder will contain the TensorBoard logs, and the `videos` folder will
-   contain the recorded videos of the agent's performance.
+### Testing with a Custom Pose
 
-6. **Monitor Training Progress**:
-   You can monitor the training progress by viewing the videos in the `videos` folder or by looking at the graphs in
-   TensorBoard:
-    ```bash
-    tensorboard --logdir "logs"
-    ```
+You can run the pre-trained agent and initialize its starting arm pose from an image of a person.
 
----
+**1. Prepare Your Image**
 
-## Usage
+-   Place an image file (e.g., `my_pose.jpg`) into the root directory of this project (`PPO-Humanoid/`).
+-   The image should clearly show a person's full body.
 
-### Running pre-trained model
+**2. Run the Test Script**
 
-To run the pre-trained PPO model, execute the following command (make sure you followed the installation steps above):
+Execute the `test_ppo.py` script. It will prompt you to enter the filename of your image.
 
 ```bash
 python test_ppo.py
 ```
 
-This will load the pre-trained model for the root of the repository (`model.pt`) and run it in the Humanoid-v5
-environment. If git lfs is not installed or not working properly, you can download the model manually from the [release page](https://github.com/ProfessorNova/PPO-Humanoid/releases). Place the downloaded `model.pt` file in the root of the repository.
+The script will then:
+-   Load your image and extract the pose.
+-   Generate an `out.jpg` file showing the detected skeleton overlaid on your image.
+-   Launch the MuJoCo simulation in a fullscreen window.
+-   Set the humanoid's initial arm positions based on the detected pose.
+-   Run the pre-trained PPO agent, which will attempt to make the humanoid walk.
 
-### Training with custom hyperparameters
+### Training a New Model
 
-You can customize the training by modifying the command-line arguments:
+You can train your own agent from scratch using the provided training script.
+
+-   To start training, run `train_ppo.py`.
+-   You can specify the number of epochs and other hyperparameters as command-line arguments.
+
+**Example Training Command:**
+
+This command will train the agent for 1000 epochs.
 
 ```bash
-python train_ppo.py --n-envs <number_of_envs> --n-epochs <number_of_epochs> ...
+python train_ppo.py --n-epochs=1000
 ```
 
-All hyperparameters can be viewed either with `python train_ppo.py --help` or by looking at the
-`parse_args_ppo` function in `lib/utils.py`.
+-   During training, progress will be logged to the `logs/` directory for TensorBoard and model checkpoints will be saved in `checkpoints/`.
+-   You can monitor training by running TensorBoard: `tensorboard --logdir=logs`
 
----
+## Detailed Pipeline Explanation
 
-## Structure
+### 1. Pose Estimation (`pose_estimation/`)
 
-The training process mainly involves the following components:
+This module is responsible for taking a static image and calculating a set of corresponding joint angles for the MuJoCo humanoid.
 
-- **lib/agent_ppo.py**: Contains the PPO agent implementation, including the policy and value networks and the necessary
-  methods for sampling actions, getting log probabilities and entropy, as well as the values from the value network.
-- **lib/buffer_ppo.py**: Implements the replay buffer to store experiences and sample batches for training. It also
-  handles
-  the GAE (Generalized Advantage Estimation) for calculating advantages.
-- **lib/utils.py**: Contains utility functions for parsing command-line arguments, setting up the environment, and
-  creating recordings of the agent's performance.
-- **train_ppo.py**: The main script for training the PPO agent. It initializes the environment, agent, and buffer,
-  and handles the training loop.
+-   **`imgAcquisition.py`**: Contains functions to load an image from a file path and preprocess it (resize, normalize) for the pose detection model.
+-   **`keyPointExtraction.py`**: Uses the **MediaPipe** library to detect a human pose in the preprocessed image. It extracts 33 keypoints (x, y, z, visibility) and then maps them to a 25-point skeleton structure similar to the BODY25 model. It also contains the logic to draw the final skeleton on the output image.
+-   **`kinematicConversion.py`**: This is the core of the pose translation. It takes the 3D keypoints and uses inverse kinematics (trigonometry and `arctan2`) to calculate the corresponding joint angles (in radians) for the humanoid's torso, arms, and legs.
 
----
+### 2. PPO Agent (`lib/`)
 
-## Statistics
+This directory contains the building blocks of the PPO algorithm.
 
-### Performance Metrics:
+-   **`agent_ppo.py`**: Defines the `PPOAgent` class, which is a PyTorch `nn.Module`. It contains two main components:
+    -   **Actor**: A neural network that takes the environment state as input and outputs the mean (`mu`) of a probability distribution for the actions (joint torques). The standard deviation (`logstd`) is a separate trainable parameter, allowing the agent to control its exploration level.
+    -   **Critic**: A neural network that estimates the value of a given state (i.e., the expected future reward).
+-   **`buffer_ppo.py`**: Implements a `PPOBuffer` to store trajectories (state, action, reward, etc.) collected from the environment. It is also responsible for calculating the **Generalized Advantage Estimation (GAE)**, which is a key part of the PPO algorithm for determining how much better or worse an action was than the policy's average.
+-   **`utils.py`**: Contains helper functions for parsing command-line arguments, creating Gymnasium environments, and logging videos of the agent's performance.
 
-The following charts provide insights into the performance during training with the current default hyperparameters:
+### 3. Training Pipeline (`train_ppo.py`)
 
-- **Reward**:
-  ![Reward](/docs/reward_mean.svg)
+This script orchestrates the entire training process.
+1.  **Initialization**: It sets up vectorized environments to collect data from multiple simulations in parallel. It initializes the `PPOAgent`, optimizer (Adam), and a learning rate scheduler.
+2.  **Data Collection**: In a loop, the agent interacts with the environments for a set number of steps (`n-steps`). All experiences are stored in the `PPOBuffer`.
+3.  **Advantage Calculation**: Once the buffer is full, it uses the critic's value of the final state to calculate the advantages and returns for all stored steps.
+4.  **Model Update**: The script then iterates over the collected data for a number of training iterations (`train-iters`). In each iteration, it computes the PPO loss function, which includes the clipped surrogate objective, a value function loss, and an entropy bonus (to encourage exploration).
+5.  **Logging**: After each epoch, it logs all relevant metrics (losses, rewards, KL divergence) to TensorBoard and saves the model checkpoint.
 
-The average reward per step basically indicates how fast the humanoid is moving.
+### 4. Testing Pipeline (`test_ppo.py`)
 
-The graph starts with a quick increase in the reward, which is expected as the agent learns to not instantly fall over.
-After that, the reward stays relatively stable, with some fluctuations. After about 500 epochs, it starts to increase
-significantly, indicating that the agent has learned to walk and tries to go faster and faster.
-
-If the reward drops temporarily, it does not necessarily mean that the agent is performing worse. It can also be due to
-the agent learning to stabilize and thus moving not as fast per step.
-
----
-
-- **Policy Loss**:
-  ![Policy Loss](/docs/loss_policy.svg)
-
-- **Value Loss**:
-  ![Value Loss](/docs/loss_value.svg)
-
-- **Entropy**:
-  ![Entropy](/docs/loss_entropy.svg)
-
----
-
-- **Learning Rate**:
-- ![Learning Rate](/docs/metrics_learning_rate.svg)
-
-- **KL Divergence**:
-- ![KL Divergence](/docs/metrics_kl.svg)
-
----
-
-## References
-
-The knowledge to implement this project was mainly acquired from the following book:
-
-- [Deep Reinforcement Learning Hands-On](https://www.amazon.com/Deep-Reinforcement-Learning-Hands-Q-networks/dp/1788834240)
-  by Maxim Lapan
+This script demonstrates the final trained agent and integrates all components.
+1.  **Pose Initialization**: It first calls the `pose_estimation` pipeline to get joint angles from a user-specified image. It then selectively applies only the **arm angles** to the humanoid's default starting `qpos` (joint positions). This provides a custom start without destabilizing the fragile walking posture.
+2.  **Viewer Setup**: It customizes the simulation window to be fullscreen and sets the camera to a wide-angle tracking view for better observation.
+3.  **Dynamic Force Application**: In the main simulation loop, it implements a stabilization strategy. It reads the agent's intended hip torques from the `action` vector and converts them into a dynamic **forward force** applied to the humanoid's shoulders. This counteracts a tendency for the upper body to lag behind the lower body, resulting in a more stable and natural-looking gait.
+4.  **Execution**: The agent takes actions, the dynamic force is applied, the environment steps forward, and the result is rendered on screen until the episode ends.
