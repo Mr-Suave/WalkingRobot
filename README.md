@@ -12,9 +12,9 @@ This project demonstrates training a walking gait for a MuJoCo Humanoid robot us
     <td><b>Initial Humanoid Pose</b></td>
   </tr>
   <tr>
-    <td><img src="img4.jpg" alt="Input Image" width="100%"></td>
-    <td><img src="out.jpg" alt="Image with skeleton identified" width="100%"></td>
-    <td><img src="initial_pose.png" alt="Humanoid with initial pose" width="100%"></td>
+    <td><img src="./PPO-Humanoid/img4.jpg" alt="Input Image" width="100%"></td>
+    <td><img src="./PPO-Humanoid/out.jpg" alt="Image with skeleton identified" width="100%"></td>
+    <td><img src="./PPO-Humanoid/initial_pose.png" alt="Humanoid with initial pose" width="100%"></td>
   </tr>
   <tr align="center">
     <td>1. The input image provided to the model.</td>
@@ -27,7 +27,7 @@ This project demonstrates training a walking gait for a MuJoCo Humanoid robot us
 
 Below is a demonstration of the full pipeline, from pose initialization to the trained agent walking.
 
-![Demo of full pipeline](docs/demo.gif)
+![Demo of full pipeline](./PPO-Humanoid/demo.mp4)
 
 ## Features
 
